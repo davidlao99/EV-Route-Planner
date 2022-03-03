@@ -17,12 +17,14 @@ async function initMap() {
     document.getElementById("submit").addEventListener("click", () => {
         highways = document.getElementById("Highways").checked;
         tolls = document.getElementById("Tolls").checked;
-        getPath(directionsService)
+        getPath(directionsService, directionsRenderer)
     });
 }
 
-async function getPath(directionsService) {
+async function getPath(directionsService, directionsRenderer) {
     var route;
+    var routeDistance;
+    var infoWindow = new google.maps.InfoWindow();
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
@@ -35,7 +37,9 @@ async function getPath(directionsService) {
                 if(document.getElementById("start").value != "My current position") {
                     origin = document.getElementById("start").value;
                 }
-                
+                var sd = document.getElementById("segDistance").value;
+                var segmentDistance = getMeters(sd);
+                var reached = false;
                 console.log(origin)
                 await directionsService
                     .route({
@@ -50,21 +54,27 @@ async function getPath(directionsService) {
                     .then((response) => {
                         console.log(response.routes[0])
                         route = response.routes[0].overview_path
+                        routeDistance = response.routes[0].legs[0].distance.value;
+                        if(segmentDistance > routeDistance) {
+                            console.log("distance to long");
+                            directionsRenderer.setDirections(response);
+                            reached = true;
+                        }
                     })
                     .catch((e) => window.alert("Directions request failed due to " + status));
 
+                if(!reached) {
                     var distance = 0;
-                    var sd = document.getElementById("segDistance").value;
-                    var segmentDistance = getMeters(sd);
-                    var stop = false
                     var closest;
-                    for(let i = 1; i < route.length; i++) {
+                    var start = Math.round(route.length / (routeDistance / segmentDistance));
+                    var stop = false;
+                    for(let i = start; i < route.length; i++) {
                         if(stop) {
                             break;
                         }
 
                         if(i % 9 == 0) {
-                            await new Promise(r => setTimeout(r, 3000));
+                            await new Promise(r => setTimeout(r, 10000));
                         }
                         
                         await directionsService
@@ -81,20 +91,22 @@ async function getPath(directionsService) {
                                 distance = response.routes[0].legs[0].distance.value;
                                 if(response.routes[0].legs[0].distance.value >= segmentDistance) {
                                     closest = { lat: route[i-1].toJSON().lat, lng: route[i-1].toJSON().lng };
-                                    // console.log(distance, i);
+                                    console.log(distance, i);
                                     stop = true;
                                 } else {
-                                    // console.log(distance, i);
+                                    console.log(distance, i);
                                 };
                             })
                             .catch((e) => window.alert("Directions request failed due to " + status));
                     }
                     // console.log(closest);
                     await getNearbyPlaces(map, closest);
+                }
             }
-
-            
         )
+    } else {
+        // Browser doesn't support Geolocation
+        handleLocationError(false, infoWindow, map.getCenter());
     } 
 }
 function getcurrent(map){
@@ -143,39 +155,20 @@ function getcurrent(map){
     });
 }
 
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+    infoWindow.setPosition(pos);
+    infoWindow.setContent(
+      browserHasGeolocation
+        ? "Error: The Geolocation service failed."
+        : "Error: Your browser doesn't support geolocation."
+    );
+    infoWindow.open(map);
+}
+
 function getMeters(i) {
     return i*1609.344;
 }
 
-
-function getChargingStation(origin, waypoints, discharge) {
-    var service = new google.maps.DistanceMatrixService();
-    var geocoder = new google.maps.Geocoder();
-
-    for(let i = 0; i < Array(waypoints).length; i++) {
-        
-        const matrixOptions = {
-            origins: [origin],
-            destinations: ["233 S Wacker Dr, Chicago, IL 60606"],
-            travelMode: 'DRIVING',
-            unitSystem: google.maps.UnitSystem.METRIC
-        }
-
-        service.getDistanceMatrix(matrixOptions, callback);
-
-        // Callback function used to process Distance Matrix response
-        function callback(response, status) {
-            if (status !== "OK") {
-            alert("Error with distance matrix");
-            return;
-            }
-            console.log(response);
-        }
-    }
-    
-
-    
-}
 async function getNearbyPlaces(map, position) {
     var position = position;
     console.log(position)
