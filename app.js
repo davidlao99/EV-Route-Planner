@@ -33,7 +33,7 @@ async function getPath(directionsService) {
                 origin = pos;
                 
                 if(document.getElementById("start").value != "My current position") {
-                    origin = document.getElementById("origin").value;
+                    origin = document.getElementById("start").value;
                 }
                 
                 console.log(origin)
