@@ -68,15 +68,16 @@ async function getPath(directionsService, directionsRenderer) {
                     var closest;
                     var start = Math.round(route.length / (routeDistance / segmentDistance));
                     var stop = false;
+                    var count = 1
                     for(let i = start; i < route.length; i++) {
                         if(stop) {
                             break;
                         }
 
-                        if(i % 9 == 0) {
-                            await new Promise(r => setTimeout(r, 10000));
+                        if(count % 10 == 0) {
+                            await new Promise(r => setTimeout(r, 8000));
                         }
-                        
+                        count++;
                         await directionsService
                             .route({
                                 origin: origin,
@@ -116,7 +117,7 @@ function getcurrent(map){
 
     locationButton.type = "image";
     locationButton.style.cursor = "pointer";
-    locationButton.src = "/src/locate.png";
+    locationButton.src = "./src/locate.png";
     locationButton.width = "40";
     locationButton.style.marginRight = "10px";
     locationButton.style.boxShadow = "0px 0px 5px #636060";
@@ -137,7 +138,7 @@ function getcurrent(map){
           var marker = new google.maps.Marker({
             position: pos,
             map: map,
-            icon: "/src/location.png",
+            icon: "./src/location.png",
           }); 
           marker.setMap(map);
 
