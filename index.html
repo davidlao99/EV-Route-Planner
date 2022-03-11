@@ -12,43 +12,28 @@
     <div id="map"></div>
     <div id="sidebar">
       <div>
+        <br />
         <b>Start:</b>
-        <select id="start">
-          <option value="My current position">My current position</option>
-          <option value="Halifax, NS">Halifax, NS</option>
-          <option value="Boston, MA">Boston, MA</option>
-          <option value="New York, NY">New York, NY</option>
-          <option value="Miami, FL">Miami, FL</option>
-        </select>
+        <input type="text" id="start"/>
+        <br />
+        <span>(Leave it empty if start from your current location)</span>
+        <br />
         <br />
         <b>Distance to Next Charging Station:</b><br />
-        <input type="number" id="segDistance" min="1"/>
+        <input type="number" id="segDistance" min="1" style="width: 30%"/>
+        <span>Miles</span>
         <br />
-        <!-- <b>Waypoints:</b> <br />
-        <i>(Ctrl+Click or Cmd+Click for multiple selection)</i> <br />
-        <select multiple id="waypoints">
-          <option value="montreal, quebec">Montreal, QBC</option>
-          <option value="toronto, ont">Toronto, ONT</option>
-          <option value="chicago, il">Chicago</option>
-          <option value="winnipeg, mb">Winnipeg</option>
-          <option value="fargo, nd">Fargo</option>
-          <option value="calgary, ab">Calgary</option>
-          <option value="spokane, wa">Spokane</option>
-        </select>
-        <br /> -->
+        <br />
         <b>End:</b>
-        <select id="end">
-          <option value="Vancouver, BC">Vancouver, BC</option>
-          <option value="Seattle, WA">Seattle, WA</option>
-          <option value="San Francisco, CA">San Francisco, CA</option>
-          <option value="Los Angeles, CA">Los Angeles, CA</option>
-        </select>
+        <input type="text" id="end"/>
+        <br />
         <br />
         <div>
           <input type="checkbox" id="Highways"> Avoid Highways
           <br>
           <input type="checkbox" id="Tolls"> Avoid Tolls
         </div>
+        <br />
         <input type="submit" id="submit" />
       </div>
       <div id="directions-panel"></div>

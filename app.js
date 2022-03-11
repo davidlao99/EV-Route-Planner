@@ -34,7 +34,7 @@ async function getPath(directionsService, directionsRenderer) {
                 };
                 origin = pos;
                 
-                if(document.getElementById("start").value != "My current position") {
+                if(document.getElementById("start").value != "") {
                     origin = document.getElementById("start").value;
                 }
                 var sd = document.getElementById("segDistance").value;
@@ -68,16 +68,15 @@ async function getPath(directionsService, directionsRenderer) {
                     var closest;
                     var start = Math.round(route.length / (routeDistance / segmentDistance));
                     var stop = false;
-                    var count = 1
                     for(let i = start; i < route.length; i++) {
                         if(stop) {
                             break;
                         }
 
-                        if(count % 10 == 0) {
-                            await new Promise(r => setTimeout(r, 8000));
+                        if(i % 9 == 0) {
+                            await new Promise(r => setTimeout(r, 10000));
                         }
-                        count++;
+                        
                         await directionsService
                             .route({
                                 origin: origin,
@@ -92,10 +91,10 @@ async function getPath(directionsService, directionsRenderer) {
                                 distance = response.routes[0].legs[0].distance.value;
                                 if(response.routes[0].legs[0].distance.value >= segmentDistance) {
                                     closest = { lat: route[i-1].toJSON().lat, lng: route[i-1].toJSON().lng };
-                                    console.log(distance, i);
+                                    // console.log(distance, i);
                                     stop = true;
                                 } else {
-                                    console.log(distance, i);
+                                    // console.log(distance, i);
                                 };
                             })
                             .catch((e) => window.alert("Directions request failed due to " + status));
@@ -110,6 +109,8 @@ async function getPath(directionsService, directionsRenderer) {
         handleLocationError(false, infoWindow, map.getCenter());
     } 
 }
+
+// Get Current Location Function
 function getcurrent(map){
     infoWindow = new google.maps.InfoWindow();
 
@@ -170,13 +171,13 @@ function getMeters(i) {
     return i*1609.344;
 }
 
+// Search for Nearby Charging Station from point on path
 async function getNearbyPlaces(map, position) {
-    var position = position;
-    console.log(position)
+    // console.log(position)
     let request = {
         location: position,
         rankBy: google.maps.places.RankBy.DISTANCE,
-        keyword: 'Electric vehicle charging J1772'
+        keyword: 'Electric vehicle charging'
     };
 
     service = new google.maps.places.PlacesService(map);
